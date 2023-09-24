@@ -44,26 +44,32 @@ def import_data(csv_file):
     data = pd.read_csv(csv_file)
     return data
 
-# Load your dataset 
+# Load your dataset
 csv_file = 'VSRR_Provisional_Drug_Overdose_Death_Counts.csv'
 data = import_data(csv_file)
 
-
 # Filter data for Kansas and select relevant columns
-kansas_data_new = data[(data['State'] == 'KS') & (data['Indicator'].str.startswith('Number of Deaths'))].copy()
+kansas_data_new = data[(data['State'] == 'KS') & (data['Indicator'].str.startswith('Number of Drug Overdose Deaths'))].copy()
 
+# Remove commas from the 'Data Value' column and convert to integers
+kansas_data_new['Data Value'] = kansas_data_new['Data Value'].str.replace(',', '').astype(int)
+
+# Group the data by year and sum the death counts
+yearly_totals = kansas_data_new.groupby('Year')['Data Value'].sum().reset_index()
 
 # Plotting the data
-plt.figure(figsize=(10, 6))
-plt.scatter(kansas_data_new['Year'], kansas_data_new['Data Value'], label='Kansans Death Count')
+plt.figure(figsize=(10, 10))
+plt.scatter(yearly_totals['Year'], yearly_totals['Data Value'], label='Kansan Overdose Deaths')
+for i, row in yearly_totals.iterrows():
+    plt.annotate(str(int(row['Data Value'])), (row['Year'], row['Data Value']), textcoords="offset points", xytext=(0,10), ha='center')
 plt.xlabel('Year')
-plt.ylabel('Death Count')
-plt.title('Total Death Counts for Kansans (Jan 2015 - Mar 2023)')
-plt.legend()
+plt.ylabel('Total Deaths')
+plt.title('Total Overdose Deaths for Kansans (Jan 2015 - Mar 2023)')
+plt.legend(['Kansan Overdose Deaths'], loc='upper left', bbox_to_anchor=(1, 1))
 
 # Save the plot as a PNG file
-output_filename = os.path.join(output_directory, 'kansas_death_counts.png')
-plt.savefig(output_filename)
+output_filename = os.path.join(output_directory, 'kansas_overdose_death_counts.png')
+plt.savefig(output_filename, bbox_inches='tight')  # Use bbox_inches='tight' to ensure the legend is not cut off
 
 # Show the plot (optional)
 plt.show()
