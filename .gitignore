@@ -149,6 +149,10 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
+# charts Directory
+.charts
+
+
 # Cython debug symbols
 cython_debug/
 

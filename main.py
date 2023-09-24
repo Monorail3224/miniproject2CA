@@ -26,31 +26,44 @@
     (20/20 points) There should be a README.md file in your project that explains what your project is, how to install the pip requirements, and how to execute the program. Please use the GitHub flavor of Markdown. Be thorough on the explanations.
 '''
 
-import pandas as pd # Library used to store input data in PANDAS data frames
-import matplotlib.pyplot as plt # Library used to create graphs from tabular data
-import os # Required to make the directory "Images" which is used as a staging area for outputted image files. 
+# INF601 - Advanced Programming in Python
+# Clayton Allen
+# Mini Project 2
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import os
 
-# Used to determine if "charts" directory exists. If it doesn't, one will be created.
-
+# Check if the "charts" directory exists. If not, create it.
 output_directory = 'charts'
 if not os.path.exists(output_directory):
     os.makedirs(output_directory)
 
-
-# Defined function that imports CSV for input as data
-
+# Function to import your chosen dataset into a Pandas DataFrame
 def import_data(csv_file):
-    # Load the data from the spreadsheet into a PANDAS DataFrame
     data = pd.read_csv(csv_file)
     return data
 
-# Function that accepts the data as a positional argument which is then used to calculate the total number of deaths for residents in Kansas from Janurary of 2015 to March 2023
+# Load your dataset 
+csv_file = 'VSRR_Provisional_Drug_Overdose_Death_Counts.csv'
+data = import_data(csv_file)
 
-def analyze(data):
-    average_death = data[(data['State'] == 'KS') & (data['Indicator'] == 'Number of Deaths')]
-    return average_death
 
-data = import_data('VSRR_Provisional_Drug_Overdose_Death_Counts.csv')
-result = analyze(data)
-print(result)
+# Filter data for Kansas and select relevant columns
+kansas_data_new = data[(data['State'] == 'KS') & (data['Indicator'].str.startswith('Number of Deaths'))].copy()
+
+
+# Plotting the data
+plt.figure(figsize=(10, 6))
+plt.scatter(kansas_data_new['Year'], kansas_data_new['Data Value'], label='Kansans Death Count')
+plt.xlabel('Year')
+plt.ylabel('Death Count')
+plt.title('Total Death Counts for Kansans (Jan 2015 - Mar 2023)')
+plt.legend()
+
+# Save the plot as a PNG file
+output_filename = os.path.join(output_directory, 'kansas_death_counts.png')
+plt.savefig(output_filename)
+
+# Show the plot (optional)
+plt.show()
