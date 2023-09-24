@@ -150,7 +150,7 @@ dmypy.json
 .pytype/
 
 # charts Directory
-.charts
+charts
 
 
 # Cython debug symbols
